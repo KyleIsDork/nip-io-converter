@@ -3,26 +3,30 @@ $domains = @()
 
 do {
     Clear-Host
-    # Prompt for IP address
-    $ip = Read-Host "Enter an IPv4 address (e.g., 192.168.0.1)"
+    # Prompt for IP address (possibly with port)
+    $ipInput = Read-Host "Enter an IPv4 address (e.g., 192.168.0.1 or 192.168.0.1:10000)"
 
-    if ($ip -match '^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$') {
+    # Extract IP and optional port
+    if ($ipInput -match '^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(:(\d+))?$') {
+        $ip = "$($Matches[1]).$($Matches[2]).$($Matches[3]).$($Matches[4])"
+        $port = if ($Matches[6]) { ":$($Matches[6])" } else { "" }
+
         $octets = $ip -split '\.'
         $hex = ($octets | ForEach-Object { '{0:x2}' -f [int]$_ }) -join ''
 
         $prefix = Read-Host "Enter a subdomain prefix (e.g., fileshare)"
         $domain = "$prefix.$hex.nip.io"
 
-        # Store the domain info in a custom object
+        # Store the domain info
         $domains += [PSCustomObject]@{
             Basic = $domain
-            HTTP = "http://$domain"
-            HTTPS = "https://$domain"
+            HTTP = "http://$domain$port"
+            HTTPS = "https://$domain$port"
         }
 
         $again = Read-Host "Would you like to enter another? (Y/N)"
     } else {
-        Write-Host "Invalid IP format. Please enter a valid IPv4 address." -ForegroundColor Red
+        Write-Host "Invalid IP address format. Please enter a valid IPv4 address (with optional :port)." -ForegroundColor Red
         $again = "Y"
         Pause
     }
