@@ -7,7 +7,6 @@ function Convert-InputToTraefik {
     param (
         [string]$Prompt = "Enter an IPv4 address (e.g. 192.168.0.1 or prefix.192.168.0.1), or a nip.io URL"
     )
-
     # Prompt user
     $rawInput = Read-Host $Prompt
 
@@ -102,32 +101,34 @@ function ConversionMenu {
 # Main Menu
 #------------------------------------------------------------------------------#
 function Show-MainMenu {
-    do {
-        Clear-Host
-        Write-Host "=== traefik.me Converter ===" -ForegroundColor Cyan
-        Write-Host "1) Convert IPv4 / nip.io addresses"
-        Write-Host "2) Exit"
-        $opt = Read-Host "Select an option (1 or 2)"
-    } until ($opt -in '1','2')
+    while ($true) {
+        do {
+            Clear-Host
+            Write-Host "=== traefik.me Converter ===" -ForegroundColor Cyan
+            Write-Host "1) Convert IPv4 / nip.io addresses"
+            Write-Host "2) Exit"
+            $opt = Read-Host "Select an option (1 or 2)"
+        } until ($opt -in '1','2')
 
-    switch ($opt) {
-        '1' {
-            $allResults = ConversionMenu
-            if ($allResults.Count) {
-                Write-Host "`nAll conversions complete:`n"
-                Write-Host "BASIC:"    -ForegroundColor DarkGray
-                $allResults | ForEach-Object { Write-Host "  $($_.Basic)" }
-                Write-Host "`nHTTP:"    -ForegroundColor Yellow
-                $allResults | ForEach-Object { Write-Host "  $($_.HTTP)" }
-                Write-Host "`nHTTPS:"   -ForegroundColor Green
-                $allResults | ForEach-Object { Write-Host "  $($_.HTTPS)" }
-                Read-Host "`nPress Enter to return to main menu"
+        switch ($opt) {
+            '1' {
+                $allResults = ConversionMenu
+                if ($allResults.Count) {
+                    Write-Host "`nAll conversions complete:`n"
+                    Write-Host "BASIC:"    -ForegroundColor DarkGray
+                    $allResults | ForEach-Object { Write-Host "  $($_.Basic)" }
+                    Write-Host "`nHTTP:"    -ForegroundColor Yellow
+                    $allResults | ForEach-Object { Write-Host "  $($_.HTTP)" }
+                    Write-Host "`nHTTPS:"   -ForegroundColor Green
+                    $allResults | ForEach-Object { Write-Host "  $($_.HTTPS)" }
+                    Read-Host "`nPress Enter to return to main menu"
+                }
             }
-            Show-MainMenu
+            '2' { return }
         }
-        '2' { return }
     }
 }
+
 
 # kick it off
 Show-MainMenu
